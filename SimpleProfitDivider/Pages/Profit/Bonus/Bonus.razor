@@ -1,0 +1,45 @@
+﻿@page "/Bonus"
+@inject IJSRuntime JS
+
+<h3>Profit Divider</h3>
+
+<div class="budget">
+    @foreach (var item in m_budgetItems)
+    {
+        <span>@item.Name</span>
+        <span>@item.Amount.ToString("c0")</span>
+        <input type="range"
+               max="@(item.Amount + RemaningMargin)"
+               step="1000"
+               @bind="@item.Amount"
+               @bind:event="oninput"
+               style="width: @(100 * (item.Amount + RemaningMargin)/m_totalBudget)%" />
+    }
+    <span>Margin: @RemaningMargin.ToString("c0") </span>
+    <br />
+    <button class="btn btn-primary" disabled="@(RemaningMargin >0)" @onclick="btnCompleteClick">Complete</button>
+</div>
+
+@code {
+    // Total Budget
+    decimal m_totalBudget = 1_000_000;
+
+    // Margin
+    public decimal RemaningMargin => m_totalBudget - m_budgetItems.Sum(b => b.Amount);
+
+    // Bugdet Items
+    List<BudgetItem> m_budgetItems = new List<BudgetItem> {
+        new BudgetItem { Name = "Sales Staff"},
+        new BudgetItem { Name = "IT Staff"},
+        new BudgetItem { Name = "Management Staff"}
+    };
+
+
+    /// <summary>
+    /// Would invoke windows.alert javascript function
+    /// </summary>
+    void btnCompleteClick()
+    {
+        JS.InvokeAsync<object>("alert", "Complete Profit Divide");
+    }
+}
